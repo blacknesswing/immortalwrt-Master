@@ -13,7 +13,7 @@
 # See /LICENSE for more information.
 #
 
-name: X86Master OpenWrt
+name: X86 OpenWrt
 
 on:
   repository_dispatch:
