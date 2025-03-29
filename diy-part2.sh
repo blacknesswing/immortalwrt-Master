@@ -18,7 +18,9 @@ sed -i 's/ImmortalWrt/OpenWrt-R2s/g' package/base-files/files/bin/config_generat
 
 # 将构建日期添加到概览页面
 # sed -i "s/%C/($(date +"%Y-%m-%d"))/g" package/base-files/files/usr/lib/os-release
-sed -i 's/%D %V/%D %V | Build by Blacknesswing |/g' package/base-files/files/usr/lib/os-release
+# sed -i 's/%D %V/%D %V | Build by Blacknesswing |/g' package/base-files/files/usr/lib/os-release
+sed -i "s/%D %V/%D %V | Build by Blacknesswing | Compiled on $(date '+%Y-%m-%d') |/g" package/base-files/files/usr/lib/os-release
+
 
 #SWAP LAN WAN（满足千兆场景，可选
 sed -i 's,"eth1" "eth0","eth0" "eth1",g' target/linux/rockchip/armv8/base-files/etc/board.d/02_network
