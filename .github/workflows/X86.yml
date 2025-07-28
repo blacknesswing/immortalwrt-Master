@@ -145,6 +145,10 @@ jobs:
 
     - name: Install feeds
       run: cd openwrt && ./scripts/feeds install -a
+    
+    - name: Patch libsodium to disable rdrand (fix thread_local error)
+      run: |
+        sed -i '/CONFIGURE_ARGS/ s/$/ --disable-rdrand/' openwrt/feeds/packages/libs/libsodium/Makefile
 
     - name: Load custom configuration
       run: |
