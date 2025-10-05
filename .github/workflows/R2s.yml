@@ -106,10 +106,14 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-        sudo bash -c 'bash <(curl -s https://build-scripts.immortalwrt.org/init_build_environment.sh)'
+        chmod +x $FREE_DISK_SH && $FREE_DISK_SH
+        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        sudo -E apt-get -qq update -y
+        sudo -E apt-get -qq full-upgrade -y
+        chmod +x $ENV_SH && $ENV_SH
         sudo timedatectl set-timezone "$TZ"
-        sudo mkdir -p /mnt/workdir
-        sudo chown $USER:$GROUPS /mnt/workdir
+        echo "硬盘详情："
+        df -Th
 
     - name: Clone source code
       working-directory: ./
