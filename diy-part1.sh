@@ -35,3 +35,17 @@ find package/ -name "*v2ray-geodata*" | xargs rm -rf
 # 克隆最新版 mosdns 和 v2ray-geodata
 git clone https://github.com/sbwml/luci-app-mosdns -b v5 package/mosdns
 git clone https://github.com/sbwml/v2ray-geodata package/v2ray-geodata
+
+echo ">>> [1/3] 替换官方 feeds 源为清华镜像..."
+sed -i 's|https://git.openwrt.org/feed/packages.git|https://mirrors.tuna.tsinghua.edu.cn/git/openwrt/feed/packages.git|' feeds.conf.default
+sed -i 's|https://git.openwrt.org/feed/luci.git|https://mirrors.tuna.tsinghua.edu.cn/git/openwrt/feed/luci.git|' feeds.conf.default
+sed -i 's|https://git.openwrt.org/feed/routing.git|https://mirrors.tuna.tsinghua.edu.cn/git/openwrt/feed/routing.git|' feeds.conf.default
+sed -i 's|https://git.openwrt.org/project/telephony.git|https://mirrors.tuna.tsinghua.edu.cn/git/openwrt/project/telephony.git|' feeds.conf.default
+
+echo ">>> [2/3] 替换部分 github 源为 ghproxy 加速..."
+sed -i 's|https://github.com|https://mirror.ghproxy.com/https://github.com|g' feeds.conf.default
+
+echo ">>> [3/3] 自定义额外 feed 示例（可选）"
+# echo "src-git helloworld https://github.com/fw876/helloworld.git" >> feeds.conf.default
+
+echo ">>> Feeds 源修改完成 ✅"
