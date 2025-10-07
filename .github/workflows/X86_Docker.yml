@@ -123,3 +123,9 @@ jobs:
       with:
         name: immortalwrt_Master_X86_Docker${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
         path: openwrt/bin/targets/*/*
+        
+    - name: 清理老的运行日志
+      uses: Mattraks/delete-workflow-runs@v2
+      with:
+        retain_days: 1
+        keep_minimum_runs: 3
