@@ -61,7 +61,6 @@ jobs:
         sudo -E apt-get -qq install -y build-essential libncurses5-dev gawk git gettext libssl-dev xsltproc zip wget python3
         sudo -E apt-get install -y python3-pyelftools python3-dev python3-setuptools swig
         sudo timedatectl set-timezone "$TZ"
-        echo ">>> 编译环境准备完成 ✅"
 
     - name: 克隆源码
       working-directory: /workdir
@@ -76,7 +75,7 @@ jobs:
         mixkey: ${{ env.REPO_BRANCH }}-${{ env.CONFIG_FILE }}
         prefix: ${{ github.workspace }}/openwrt
 
-    - name: 自定义 feeds（可选）
+    - name: 自定义 feeds
       run: |
         [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
         chmod +x $DIY_P1_SH
