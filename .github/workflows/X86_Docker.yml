@@ -117,12 +117,18 @@ jobs:
       if: (!cancelled())
       run: df -hT
 
+    - name: 整理固件
+      run: |
+        cd openwrt/bin/targets/*/*
+        rm -rf packages
+        echo "FIRMWARE=$PWD" >> $GITHUB_ENV      
+
     - name: 上传固件文件
       uses: actions/upload-artifact@main
       if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       with:
         name: immortalwrt_Master_X86_Docker${{ env.FILE_DATE }}
-        path: openwrt/bin/targets/*/*
+        path: ${{ env.FIRMWARE }}
         
     - name: 清理老的运行日志
       uses: Mattraks/delete-workflow-runs@v2
