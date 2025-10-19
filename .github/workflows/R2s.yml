@@ -10,7 +10,7 @@
 # See /LICENSE for more information.
 #
 
-name: R2s OpenWrt
+name: OpenWrt R2s
 
 on:
   workflow_dispatch:
