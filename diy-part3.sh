@@ -49,8 +49,8 @@ boot() {
     model="$(cat /sys/class/dmi/id/product_name 2>/dev/null)"
     if [ -z "$model" ] || echo "$model" | grep -qi "default string"; then
         mkdir -p /tmp/sysinfo
-        echo "X86 Software Router" > /tmp/sysinfo/model
-        logger -t fix-x86-model "BIOS 未提供主板信息，型号已设为 X86 Software Router"
+        echo "X86 Router" > /tmp/sysinfo/model
+        logger -t fix-x86-model "BIOS 未提供主板信息，型号已设为 X86 Router"
     else
         logger -t fix-x86-model "检测到主板型号: $model，保持原样"
     fi
