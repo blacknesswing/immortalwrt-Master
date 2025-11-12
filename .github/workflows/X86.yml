@@ -73,12 +73,6 @@ jobs:
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
         df -hT
 
-    - name: 缓存构建加速
-      uses: HiGarfield/cachewrtbuild@main
-      with:
-        mixkey: ${{ env.REPO_BRANCH }}-${{ env.CONFIG_FILE }}
-        prefix: ${{ github.workspace }}/openwrt
-
     - name: 自定义 feeds
       run: |
         [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
