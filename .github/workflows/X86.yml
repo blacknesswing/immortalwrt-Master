@@ -60,8 +60,12 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-        sudo -E apt-get -qq update -y
-        sudo -E apt-get -qq full-upgrade -y
+        sudo -E apt-get remove -y snapd needrestart || true
+        sudo -E rm -rf /var/lib/apt/lists/*
+        sudo -E apt-get clean
+        sudo -E apt-get update -y || sudo apt-get update --fix-missing -y
+        sudo -E apt-get install -f -y
+        sudo -E dpkg --configure -a || truey
         sudo -E apt-get -qq install -y \
           antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
           bzip2 ccache clang cmake cpio curl device-tree-compiler ecj fastjar flex gawk gettext \
