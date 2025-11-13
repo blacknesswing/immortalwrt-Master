@@ -59,3 +59,12 @@ EOF
 
 chmod +x package/base-files/files/etc/init.d/fix-x86-model
 
+# ============================================
+# 修复 libdouble-conversion 的 CMake 兼容性问题
+# ============================================
+echo ">>> 修复 libdouble-conversion 的 CMake 3.5 兼容性问题..."
+sed -i '/CMAKE_OPTIONS/s/$/\nCMAKE_OPTIONS += -DCMAKE_POLICY_VERSION_MINIMUM=3.5/' \
+  feeds/packages/libs/libdouble-conversion/Makefile || \
+echo 'CMAKE_OPTIONS += -DCMAKE_POLICY_VERSION_MINIMUM=3.5' >> feeds/packages/libs/libdouble-conversion/Makefile
+
+
