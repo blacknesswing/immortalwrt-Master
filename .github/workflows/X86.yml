@@ -84,7 +84,6 @@ jobs:
        sudo timedatectl set-timezone "$TZ"
        sudo mkdir -p /workdir
        sudo chown $USER:$USER /workdir
-
     - name: 克隆源码
       working-directory: /workdir
       run: |
