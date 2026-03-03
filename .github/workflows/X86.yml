@@ -13,7 +13,7 @@
 # See /LICENSE for more information.
 #
 
-name: OpenWrt X86
+name: openwrt X86
 
 on:
   workflow_dispatch:
@@ -47,7 +47,7 @@ jobs:
     - name: 显示磁盘空间
       run: df -h
 
-    - name: Checkout 当前仓库
+    - name: Checkout 仓库
       uses: actions/checkout@v4
 
     - name: 初始化编译环境
@@ -55,7 +55,9 @@ jobs:
         DEBIAN_FRONTEND: noninteractive
       run: |
         sudo timedatectl set-timezone "$TZ"
+
         sudo apt-get update
+
         sudo apt-get install -y \
           build-essential flex bison g++ gawk gcc-multilib g++-multilib \
           gettext git libncurses-dev libssl-dev libelf-dev \
@@ -70,6 +72,7 @@ jobs:
           libgnutls28-dev \
           p7zip-full \
           libc6-dev-i386
+
         sudo apt-get clean
 
     - name: 克隆源码
@@ -77,20 +80,20 @@ jobs:
         git clone $REPO_URL -b $REPO_BRANCH openwrt
         df -h
 
-    - name: 构建缓存加速
+    - name: 缓存构建加速
       uses: HiGarfield/cachewrtbuild@main
       with:
         mixkey: ${{ env.REPO_BRANCH }}-${{ env.CONFIG_FILE }}
         prefix: ${{ github.workspace }}/openwrt
 
-    - name: 自定义 Feeds
+    - name: 自定义 feeds
       run: |
         [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
         chmod +x $DIY_P1_SH
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P1_SH
 
-    - name: 更新并安装 Feeds
+    - name: 更新并安装 feeds
       run: |
         cd openwrt
         ./scripts/feeds update -a
@@ -104,7 +107,7 @@ jobs:
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P2_SH
 
-    - name: 下载依赖
+    - name: 下载依赖包
       run: |
         cd openwrt
         make defconfig
@@ -117,29 +120,22 @@ jobs:
         echo "使用 $(nproc) 线程编译..."
         make -j$(nproc) || make -j1 V=s
 
-    - name: 整理并自动重命名固件
-      run: |
-        cd openwrt/bin/targets/*/*
-
-        DATE=$(date +"%Y%m%d")
-        BRANCH=${{ env.REPO_BRANCH }}
-
-        for file in *.img.gz; do
-          mv "$file" "ImmortalWrt_X86_Master_${BRANCH}_${DATE}.img.gz"
-        done
-
-        rm -rf packages
-        echo "FIRMWARE=$PWD" >> $GITHUB_ENV
-
-    - name: 显示磁盘使用情况
+    - name: 查看磁盘使用情况
       if: (!cancelled())
       run: df -h
+
+    - name: 整理固件
+      run: |
+        cd openwrt/bin/targets/*/*
+        rm -rf packages
+        echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+        echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
 
     - name: 上传固件
       uses: actions/upload-artifact@v4
       if: !cancelled()
       with:
-        name: ImmortalWrt_X86_Master_${{ env.REPO_BRANCH }}
+        name: immortalwrt_Master_X86${{ env.FILE_DATE }}
         path: ${{ env.FIRMWARE }}
 
     - name: 清理老的运行日志
