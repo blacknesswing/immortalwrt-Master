@@ -58,9 +58,11 @@ jobs:
 
     - name: 自定义 feeds
       run: |
-        chmod +x $DIY_P1_SH
-        cd openwrt
-        ../$DIY_P1_SH
+       if [ -f "$DIY_P1_SH" ]; then
+       chmod +x $DIY_P1_SH
+       cd openwrt
+       ../$DIY_P1_SH
+       fi
 
     - name: 更新 feeds
       run: |
