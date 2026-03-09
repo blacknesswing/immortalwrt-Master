@@ -1,4 +1,4 @@
-name: 111OpenWrt X86
+name: OpenWrt X86
 
 on:
   workflow_dispatch:
