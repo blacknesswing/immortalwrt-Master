@@ -121,7 +121,7 @@ jobs:
         DATE=$(date +"%Y%m%d")
         BRANCH=${REPO_BRANCH}
         for file in *.img.gz; do
-          [ -e "$file" ] && mv "$file" "ImmortalWrt_Master_X86_DOcker_${BRANCH}_${DATE}.img.gz"
+          [ -e "$file" ] && mv "$file" "ImmortalWrt_Master_X86_Docker_${BRANCH}_${DATE}.img.gz"
         done
         rm -rf packages
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
