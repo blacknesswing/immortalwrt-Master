@@ -59,7 +59,6 @@ jobs:
         DEBIAN_FRONTEND: noninteractive
       run: |
         sudo apt update
-
         sudo apt install -y \
         autoconf automake autopoint binutils bison build-essential \
         bzip2 cmake cpio curl flex gawk git gettext \
@@ -72,7 +71,6 @@ jobs:
         squashfs-tools subversion swig texinfo unzip \
         vim wget zip zlib1g-dev upx-ucl genisoimage \
         device-tree-compiler file clang llvm
-
         sudo timedatectl set-timezone "$TZ"
 
     - name: 克隆源码
@@ -126,16 +124,12 @@ jobs:
     - name: 整理并自动重命名固件
       run: |
         cd openwrt/bin/targets/*/* || exit 0
-
         DATE=$(date +"%Y%m%d")
         BRANCH=${REPO_BRANCH}
-
         for file in *.img.gz 2>/dev/null; do
           [ -e "$file" ] && mv "$file" "ImmortalWrt_Master_X86_${BRANCH}_${DATE}.img.gz"
         done
-
         rm -rf packages
-
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
 
     - name: 上传固件
