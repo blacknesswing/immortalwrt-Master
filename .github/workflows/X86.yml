@@ -14,7 +14,6 @@
 #
 
 name: OpenWrt X86
-
 on:
   workflow_dispatch:
 
@@ -34,6 +33,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    
     steps:
     - name: 最大化磁盘空间
       uses: easimon/maximize-build-space@v10
@@ -85,7 +85,6 @@ jobs:
     - name: 自定义 Feeds
       run: |
         [ -e "${FEEDS_CONF}" ] && mv "${FEEDS_CONF}" openwrt/feeds.conf.default
-
         chmod +x "${DIY_P1_SH}"
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P1_SH
