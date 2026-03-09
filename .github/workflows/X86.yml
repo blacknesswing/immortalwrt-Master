@@ -14,140 +14,130 @@
 #
 
 name: OpenWrt X86
-
 on:
-workflow_dispatch:
+  workflow_dispatch:
 
 env:
-REPO_URL: https://github.com/immortalwrt/immortalwrt
-REPO_BRANCH: master
-FEEDS_CONF: feeds.conf.default
-CONFIG_FILE: X86.config
-DIY_P1_SH: diy-part1.sh
-DIY_P2_SH: diy-part3.sh
-TZ: Asia/Shanghai
+  REPO_URL: https://github.com/immortalwrt/immortalwrt
+  REPO_BRANCH: master
+  FEEDS_CONF: feeds.conf.default
+  CONFIG_FILE: X86.config
+  DIY_P1_SH: diy-part1.sh
+  DIY_P2_SH: diy-part3.sh
+  TZ: Asia/Shanghai
 
-UPLOAD_BIN_DIR: false
-UPLOAD_FIRMWARE: true
-UPLOAD_RELEASE: false
+  UPLOAD_BIN_DIR: false
+  UPLOAD_FIRMWARE: true
+  UPLOAD_RELEASE: false
 
 jobs:
-build:
-runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 最大化磁盘空间
+      uses: easimon/maximize-build-space@v10
+      with:
+        root-reserve-mb: 1024
+        swap-size-mb: 2048
+        remove-dotnet: true
+        remove-android: true
+        remove-haskell: true
+        remove-codeql: true
+        remove-docker-images: true
 
-```
-steps:
-  - name: 最大化磁盘空间
-    uses: easimon/maximize-build-space@v10
-    with:
-      root-reserve-mb: 1024
-      swap-size-mb: 2048
-      remove-dotnet: true
-      remove-android: true
-      remove-haskell: true
-      remove-codeql: true
-      remove-docker-images: true
+    - name: 显示磁盘空间
+      run: df -h
 
-  - name: 显示磁盘空间
-    run: df -h
+    - name: Checkout 仓库
+      uses: actions/checkout@v4
 
-  - name: Checkout 仓库
-    uses: actions/checkout@v4
+    - name: 初始化编译环境
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo apt update
+        sudo apt install -y \
+        autoconf automake autopoint binutils bison build-essential \
+        bzip2 cmake cpio curl flex gawk git gettext \
+        haveged help2man jq libelf-dev libfuse-dev \
+        libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev \
+        libmpfr-dev libncurses-dev libpython3-dev \
+        libreadline-dev libssl-dev libtool ninja-build \
+        patch pkgconf python3 python3-dev python3-pip \
+        python3-setuptools python3-pyelftools rsync \
+        squashfs-tools subversion swig texinfo unzip \
+        vim wget zip zlib1g-dev upx-ucl genisoimage \
+        device-tree-compiler file clang llvm
+        sudo timedatectl set-timezone "$TZ"
 
-  - name: 初始化编译环境
-    env:
-      DEBIAN_FRONTEND: noninteractive
-    run: |
-      sudo apt update
-      sudo apt install -y \
-      autoconf automake autopoint binutils bison build-essential \
-      bzip2 cmake cpio curl flex gawk git gettext \
-      haveged help2man jq libelf-dev libfuse-dev \
-      libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev \
-      libmpfr-dev libncurses-dev libpython3-dev \
-      libreadline-dev libssl-dev libtool ninja-build \
-      patch pkgconf python3 python3-dev python3-pip \
-      python3-setuptools python3-pyelftools rsync \
-      squashfs-tools subversion swig texinfo unzip \
-      vim wget zip zlib1g-dev upx-ucl genisoimage \
-      device-tree-compiler file clang llvm
+    - name: 克隆源码
+      run: |
+        git clone "${REPO_URL}" -b "${REPO_BRANCH}" openwrt
+        df -h
 
-      sudo timedatectl set-timezone "$TZ"
+    - name: 构建缓存加速
+      uses: HiGarfield/cachewrtbuild@main
+      with:
+        mixkey: ${{ env.REPO_BRANCH }}-${{ env.CONFIG_FILE }}
+        prefix: ${{ github.workspace }}/openwrt
 
-  - name: 克隆源码
-    run: |
-      git clone "${REPO_URL}" -b "${REPO_BRANCH}" openwrt
-      df -h
+    - name: 自定义 Feeds
+      run: |
+        [ -e "${FEEDS_CONF}" ] && mv "${FEEDS_CONF}" openwrt/feeds.conf.default
+        chmod +x "${DIY_P1_SH}"
+        cd openwrt
+        $GITHUB_WORKSPACE/$DIY_P1_SH
 
-  - name: 构建缓存加速
-    uses: HiGarfield/cachewrtbuild@main
-    with:
-      mixkey: ${{ env.REPO_BRANCH }}-${{ env.CONFIG_FILE }}
-      prefix: ${{ github.workspace }}/openwrt
+    - name: 更新并安装 Feeds
+      run: |
+        cd openwrt
+        ./scripts/feeds update -a
+        ./scripts/feeds install -a
 
-  - name: 自定义 Feeds
-    run: |
-      [ -e "${FEEDS_CONF}" ] && mv "${FEEDS_CONF}" openwrt/feeds.conf.default
-      chmod +x "${DIY_P1_SH}"
-      cd openwrt
-      $GITHUB_WORKSPACE/$DIY_P1_SH
+    - name: 加载自定义配置
+      run: |
+        [ -e files ] && mv files openwrt/files
+        [ -e "${CONFIG_FILE}" ] && mv "${CONFIG_FILE}" openwrt/.config
 
-  - name: 更新并安装 Feeds
-    run: |
-      cd openwrt
-      ./scripts/feeds update -a
-      ./scripts/feeds install -a
+        chmod +x "${DIY_P2_SH}"
+        cd openwrt
+        $GITHUB_WORKSPACE/$DIY_P2_SH
 
-  - name: 加载自定义配置
-    run: |
-      [ -e files ] && mv files openwrt/files
-      [ -e "${CONFIG_FILE}" ] && mv "${CONFIG_FILE}" openwrt/.config
+    - name: 下载依赖
+      run: |
+        cd openwrt
+        make defconfig
+        make download -j8 || true
+        find dl -size -1024c -exec rm -f {} \;
 
-      chmod +x "${DIY_P2_SH}"
-      cd openwrt
-      $GITHUB_WORKSPACE/$DIY_P2_SH
+    - name: 编译固件
+      run: |
+        cd openwrt
+        echo "使用 $(nproc) 线程编译..."
+        make -j$(nproc) || make -j1 V=s
 
-  - name: 下载依赖
-    run: |
-      cd openwrt
-      make defconfig
-      make download -j8 || true
-      find dl -size -1024c -exec rm -f {} \;
 
-  - name: 编译固件
-    run: |
-      cd openwrt
-      echo "使用 $(nproc) 线程编译..."
-      make -j$(nproc) || make -j1 V=s
+    - name: 整理并自动重命名固件
+      run: |
+        cd openwrt/bin/targets/*/* || exit 0
+        DATE=$(date +"%Y%m%d")
+        BRANCH=${REPO_BRANCH}
+        for file in *.img.gz; do
+          [ -e "$file" ] && mv "$file" "ImmortalWrt_Master_X86_${BRANCH}_${DATE}.img.gz"
+        done
+        rm -rf packages
+        echo "FIRMWARE=$PWD" >> $GITHUB_ENV
 
-   - name: 整理并自动重命名固件
-     run: |
-       cd openwrt/bin/targets/*/* || exit 0
+    - name: 上传固件
+      uses: actions/upload-artifact@v4
+      if: success()
+      with:
+        name: ImmortalWrt_Master_X86_${{ env.REPO_BRANCH }}
+        path: ${{ env.FIRMWARE }}
 
-       DATE=$(date +"%Y%m%d")
-       BRANCH=${REPO_BRANCH}
-       for file in *.img.gz; do
-         [ -e "$file" ] || continue
-
-         NAME=$(basename "$file")
-         NEW="ImmortalWrt_X86_${BRANCH}_${DATE}_${NAME}"
-
-         echo "Rename $file -> $NEW"
-         mv "$file" "$NEW"
-       done
-
-       rm -rf packages
-       echo "FIRMWARE=$PWD" >> $GITHUB_ENV
-
-  - name: 上传固件
-    uses: actions/upload-artifact@v4
-    if: success()
-    with:
-      name: ImmortalWrt_Master_X86_${{ env.REPO_BRANCH }}
-      path: ${{ env.FIRMWARE }}
-
-  - name: 清理运行日志
-    uses: Mattraks/delete-workflow-runs@v2
-    with:
-      retain_days: 1
-      keep_minimum_runs: 3
+    - name: 清理运行日志
+      uses: Mattraks/delete-workflow-runs@v2
+      with:
+        retain_days: 1
+        keep_minimum_runs: 3
