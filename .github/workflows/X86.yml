@@ -123,13 +123,11 @@ jobs:
         cd openwrt/bin/targets/*/* || exit 0
         DATE=$(date +"%Y%m%d")
         BRANCH=${REPO_BRANCH}
-
         for file in *.img.gz; do
           [ -e "$file" ] || continue
           NEW="ImmortalWrt_Master_X86_${BRANCH}_${DATE}_${file}"
           mv "$file" "$NEW"
         done
-
         rm -rf packages
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
 
