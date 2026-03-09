@@ -117,17 +117,20 @@ jobs:
         echo "使用 $(nproc) 线程编译..."
         make -j$(nproc) || make -j1 V=s
 
-
     - name: 整理并自动重命名固件
       run: |
-        cd openwrt/bin/targets/*/* || exit 0
-        DATE=$(date +"%Y%m%d")
-        BRANCH=${REPO_BRANCH}
-        for file in *.img.gz 2>/dev/null; do
-          [ -e "$file" ] && mv "$file" "ImmortalWrt_Master_X86_${BRANCH}_${DATE}.img.gz"
-        done
-        rm -rf packages
-        echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+       cd openwrt/bin/targets/*/* || exit 0
+       DATE=$(date +"%Y%m%d")
+       BRANCH=${REPO_BRANCH}
+       for file in *.img.gz; do
+       [ -e "$file" ] || continue
+       NAME=$(basename "$file")
+       NEW="ImmortalWrt_Master_X86_${BRANCH}_${DATE}_${NAME}"
+       echo "Rename $file -> $NEW"
+       mv "$file" "$NEW"
+    done
+    rm -rf packages
+    echo "FIRMWARE=$PWD" >> $GITHUB_ENV
 
     - name: 上传固件
       uses: actions/upload-artifact@v4
