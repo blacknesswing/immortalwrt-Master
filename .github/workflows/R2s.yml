@@ -141,7 +141,7 @@ jobs:
       uses: actions/upload-artifact@main
       if: success()
       with:
-        name: ImmortalWrt_Master_R2s_${{ env.REPO_BRANCH }}
+        name: ImmortalWrt_Master_R2s_${{ env.FILE_DATE }}
         path: ${{ env.FIRMWARE }}
 
     - name: 清理运行日志
