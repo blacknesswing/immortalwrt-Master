@@ -39,7 +39,7 @@ jobs:
       uses: easimon/maximize-build-space@master
       with:
         root-reserve-mb: 2048
-        swap-size-mb: 1024
+        swap-size-mb: 2048
         build-mount-path: /workdir
         remove-dotnet: true
         remove-android: true
@@ -111,7 +111,7 @@ jobs:
       run: |
         cd openwrt
         make defconfig
-        make download -j8 || true
+        make download -j$(nproc) || true
         find dl -size -1024c -exec rm -f {} \;
 
     - name: 编译固件
