@@ -121,11 +121,16 @@ jobs:
     - name: 整理并自动重命名固件
       run: |
         cd openwrt/bin/targets/*/* || exit 0
-        DATE=$(date +"%Y%m%d")
+        DATE=$(TZ=Asia/Shanghai date +"%Y%m%d_%H%M")
         echo "FILE_DATE=$DATE" >> $GITHUB_ENV
         rm -f *rootfs* *kernel* *.manifest *.buildinfo
         for file in *.img.gz; do
           [ -e "$file" ] || continue
+        if [[ $file == *efi* ]]; then
+          TYPE="UEFI"
+        else
+          TYPE="Legacy"
+        fi  
           NEW="ImmortalWrt_Master_X86_${DATE}_${file#openwrt-}"
           mv "$file" "$NEW"
         done
