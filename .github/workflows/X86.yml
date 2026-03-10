@@ -137,7 +137,7 @@ jobs:
 
 
     - name: 上传固件
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@main
       if: success()
       with:
         name: ImmortalWrt_Master_X86_${{ env.FILE_DATE }}
