@@ -13,7 +13,7 @@
 # See /LICENSE for more information.
 #
 
-name: OpenWrt X86
+name: OpenWrt X86111
 
 on:
   workflow_dispatch:
