@@ -135,7 +135,7 @@ jobs:
       uses: actions/upload-artifact@v4
       if: success()
       with:
-        name: ImmortalWrt_Master_X86_${{ env.REPO_BRANCH }}
+        name: ImmortalWrt_Master_X86_${{ env.FILE_DATE }}
         path: ${{ env.FIRMWARE }}
 
     - name: 清理运行日志
