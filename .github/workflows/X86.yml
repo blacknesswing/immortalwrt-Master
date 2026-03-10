@@ -118,7 +118,7 @@ jobs:
         make -j$(nproc) || make -j1 V=s
 
 
-    - name: 整理并自动重命名固件
+    - name: 整理固件
       run: |
         cd openwrt/bin/targets/*/* || exit 0
         DATE=$(TZ=Asia/Shanghai date +"%Y%m%d_%H%M")
