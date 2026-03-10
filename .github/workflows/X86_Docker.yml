@@ -115,12 +115,14 @@ jobs:
         make -j$(nproc) || make -j1 V=s
 
 
-    - name: 整理并自动重命名固件
+    - name: 整理固件
       run: |
         cd openwrt/bin/targets/*/* || exit 0
-        DATE=$(date +"%Y%m%d")
-        BRANCH=${REPO_BRANCH}
+        DATE=$(TZ=Asia/Shanghai date +"%Y%m%d_%H%M")
+        echo "FILE_DATE=$DATE" >> $GITHUB_ENV
+        rm -f *rootfs* *kernel* *.manifest *.buildinfo
         for file in *.img.gz; do
+          [ -e "$file" ] || continue  
           [ -e "$file" ] && mv "$file" "ImmortalWrt_Master_X86_Docker_${BRANCH}_${DATE}.img.gz"
         done
         rm -rf packages
