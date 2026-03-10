@@ -47,9 +47,6 @@ jobs:
         remove-codeql: true
         remove-docker-images: true
 
-    - name: 显示磁盘空间
-      run: df -h
-
     - name: Checkout 仓库
       uses: actions/checkout@main
 
