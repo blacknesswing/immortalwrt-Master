@@ -122,12 +122,12 @@ jobs:
         cd openwrt/bin/targets/*/* || exit 0
         rm -rf packages
         rm -f *rootfs* *kernel* *.manifest *.buildinfo
-        DATE=$(TZ=Asia/Shanghai date +"%Y%m%d_%H%M")             
+        DATE=$(TZ=Asia/Shanghai date +"%Y%m%d")             
         for file in *.img.gz *.bin *.qcow2 *.vdi *.vmdk; do
           [ -f "$file" ] || continue
           EXT="${file##*.}"             
           NAME="${file%.*}"             
-          NEW="Master_${NAME}_${DATE}.${EXT}"
+          NEW="Master_${DATE}_${NAME}.${EXT}"
           mv -f "$file" "$NEW"
         done
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
