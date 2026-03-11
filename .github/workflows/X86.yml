@@ -127,21 +127,18 @@ jobs:
     - name: 整理固件
       run: |
         cd openwrt/bin/targets/*/* || exit 0
-        DATE=$(TZ=Asia/Shanghai date +"%Y%m%d_%H%M")
-        echo "FILE_DATE=$DATE" >> $GITHUB_ENV
+        rm -rf packages
         rm -f *rootfs* *kernel* *.manifest *.buildinfo
-        for file in *.img.gz; do
-          [ -f "$file" ] || continue  
-          if [[ "$file" == *efi* ]]; then
-            TYPE="combined-efi.img.gz"
-          else
-            TYPE="combined.img.gz"
-          fi
-          NEW="ImmortalWrt_Master_X86_${DATE}_${TYPE}"
+        DATE=$(TZ=Asia/Shanghai date +"%Y%m%d_%H%M")             
+        for file in *.img.gz *.bin *.qcow2 *.vdi *.vmdk; do
+          [ -f "$file" ] || continue
+          EXT="${file##*.}"             
+          NAME="${file%.*}"             
+          NEW="ImmortalWrt_${NAME}_${DATE}.${EXT}"
           mv -f "$file" "$NEW"
         done
-        rm -rf packages
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+        echo "FILE_DATE=$DATE" >> $GITHUB_ENV 
 
     - name: 上传固件
       uses: actions/upload-artifact@main
