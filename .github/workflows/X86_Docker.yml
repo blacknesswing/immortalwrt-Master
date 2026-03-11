@@ -129,7 +129,7 @@ jobs:
         rm -f *rootfs* *kernel* *.manifest *.buildinfo
         for file in *.img.gz; do
           [ -e "$file" ] || continue 
-          [ -e "$file" ] && mv "$file" "ImmortalWrt_Master_X86_Docker_${DATE}_${file#openwrt-}"
+          NEW="ImmortalWrt_Master_X86_Docker_${DATE}_${file#openwrt-}"
           mv "$file" "$NEW"
         done
         rm -rf packages
