@@ -131,9 +131,19 @@ jobs:
 
     - name: 整理固件
       run: |
-        cd openwrt/bin/targets/*/*
+        cd openwrt/bin/targets/*/* || exit 0
         rm -rf packages
-        echo "FIRMWARE=$PWD" >> $GITHUB_ENV      
+        rm -f *rootfs* *kernel* *.manifest *.buildinfo
+        DATE=$(TZ=Asia/Shanghai date +"%Y%m%d_%H%M")             
+        for file in *.img.gz *.bin *.qcow2 *.vdi *.vmdk; do
+          [ -f "$file" ] || continue
+          EXT="${file##*.}"             
+          NAME="${file%.*}"             
+          NEW="ImmortalWrt_${NAME}_${DATE}.${EXT}"
+          mv -f "$file" "$NEW"
+        done
+        echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+        echo "FILE_DATE=$DATE" >> $GITHUB_ENV      
 
     - name: 上传固件文件
       uses: actions/upload-artifact@main
