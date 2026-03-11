@@ -134,7 +134,7 @@ jobs:
           [ -f "$file" ] || continue
           EXT="${file##*.}"             
           NAME="${file%.*}"             
-          NEW="ImmortalWrt_${NAME}_${DATE}.${EXT}"
+          NEW="Master_${NAME}_${DATE}.${EXT}"
           mv -f "$file" "$NEW"
         done
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
