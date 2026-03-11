@@ -137,11 +137,9 @@ jobs:
           else
             TYPE="combined.img.gz"
           fi
-
           NEW="ImmortalWrt_Master_X86_${DATE}_${TYPE}"
           mv -f "$file" "$NEW"
         done
-
         rm -rf packages
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
 
